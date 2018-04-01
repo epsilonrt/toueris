@@ -12,7 +12,7 @@ Copyright © 2018 Rouviere High School, Toulon, France, All rights reserved.
 ## Abstract
 
 Toueris is a system of supervision of terrestrial seismographic stations.  
-This project is developed by the [BTS Systèmes Numériques](http://www.lycee-rouviere.fr/index.php/superieur/b-t-s/systemes-numeriques-option-b), option "Electronics and Communication" of [Rouviere High School](http://www.lycee-rouviere.fr) from Toulon, France.  
+This project is developed by the [BTS Digital Systems](http://www.lycee-rouviere.fr/index.php/superieur/b-t-s/systemes-numeriques-option-b), option "Electronics and Communication" of [Rouviere High School](http://www.lycee-rouviere.fr) from Toulon, France.  
 It meets a specification expressed by the seismology laboratory [GeoAzur](https://geoazur.oca.eu/fr/obs-sismo-geoazur) of [CNRS](http://www.cnrs.fr/index.html).  
 
 Toueris is an open source project under [CeCILL Free Software License Version 2.1](http://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html)
