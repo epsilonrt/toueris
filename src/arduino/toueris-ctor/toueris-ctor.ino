@@ -72,7 +72,7 @@ void setup() {
   }
   lcd.setcontrast (24); // contrast value range is 0-63, try 25@5V or 50@3.3V as a starting value
   //          0123456789012345
-  lcd.print ("TOUERIS CTOR ");
+  lcd.print ("CTOR v");
   lcd.print (VERSION_SHORT);
   lcd.setCursor (1, 0);
   lcd.print ("Waiting HMI...");

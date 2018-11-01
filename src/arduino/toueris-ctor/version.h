@@ -1,7 +1,7 @@
-#define VERSION "0.1"
-#define VERSION_SHORT "0.1"
+#define VERSION "0.1-1-g2c03923"
+#define VERSION_SHORT "0.1.1"
 #define VERSION_TINY "0.1"
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 1
-#define VERSION_PATCH 0
-#define VERSION_SHA1 0x0
+#define VERSION_PATCH 1
+#define VERSION_SHA1 0x2c03923
