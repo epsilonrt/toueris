@@ -1,31 +1,31 @@
 /*
-             LUFA Library
-     Copyright (C) Dean Camera, 2011.
+						 LUFA Library
+		 Copyright (C) Dean Camera, 2011.
 
-  dean [at] fourwalledcubicle [dot] com
-           www.lufa-lib.org
+	dean [at] fourwalledcubicle [dot] com
+					 www.lufa-lib.org
 */
 
 /*
-  Copyright 2011  Dean Camera (dean [at] fourwalledcubicle [dot] com)
+	Copyright 2011  Dean Camera (dean [at] fourwalledcubicle [dot] com)
 
-  Permission to use, copy, modify, distribute, and sell this
-  software and its documentation for any purpose is hereby granted
-  without fee, provided that the above copyright notice appear in
-  all copies and that both that the copyright notice and this
-  permission notice and warranty disclaimer appear in supporting
-  documentation, and that the name of the author not be used in
-  advertising or publicity pertaining to distribution of the
-  software without specific, written prior permission.
+	Permission to use, copy, modify, distribute, and sell this
+	software and its documentation for any purpose is hereby granted
+	without fee, provided that the above copyright notice appear in
+	all copies and that both that the copyright notice and this
+	permission notice and warranty disclaimer appear in supporting
+	documentation, and that the name of the author not be used in
+	advertising or publicity pertaining to distribution of the
+	software without specific, written prior permission.
 
-  The author disclaim all warranties with regard to this
-  software, including all implied warranties of merchantability
-  and fitness.  In no event shall the author be liable for any
-  special, indirect or consequential damages or any damages
-  whatsoever resulting from loss of use, data or profits, whether
-  in an action of contract, negligence or other tortious action,
-  arising out of or in connection with the use or performance of
-  this software.
+	The author disclaim all warranties with regard to this
+	software, including all implied warranties of merchantability
+	and fitness.  In no event shall the author be liable for any
+	special, indirect or consequential damages or any damages
+	whatsoever resulting from loss of use, data or profits, whether
+	in an action of contract, negligence or other tortious action,
+	arising out of or in connection with the use or performance of
+	this software.
 */
 
 /** \file
@@ -40,9 +40,9 @@
  *  operating systems will not open the port unless the settings can be set successfully.
  */
 static CDC_LineEncoding_t LineEncoding = { .BaudRateBPS = 0,
-                                           .CharFormat  = CDC_LINEENCODING_OneStopBit,
-                                           .ParityType  = CDC_PARITY_None,
-                                           .DataBits    = 8                            };
+																					 .CharFormat  = CDC_LINEENCODING_OneStopBit,
+																					 .ParityType  = CDC_PARITY_None,
+																					 .DataBits    = 8                            };
 
 /** Current address counter. This stores the current address of the FLASH or EEPROM as set by the host,
  *  and is used when reading or writing to the AVRs memory (either FLASH or EEPROM depending on the issued
@@ -161,6 +161,10 @@ int main(void)
 /** Configures all hardware required for the bootloader. */
 void SetupHardware(void)
 {
+#if DEVICE_VID == 0x1209
+	uint8_t usb_opt = USB_DEVICE_OPT_FULLSPEED | USB_OPT_AUTO_PLL;
+#endif
+
 	/* Disable watchdog if enabled by bootloader/fuses */
 	MCUSR &= ~(1 << WDRF);
 	wdt_disable();
@@ -189,8 +193,24 @@ void SetupHardware(void)
 	TIMSK1 = (1 << OCIE1A);					// enable timer 1 output compare A match interrupt
 	TCCR1B = ((1 << CS11) | (1 << CS10));	// 1/64 prescaler on timer 1 input
 
+#if DEVICE_VID == 0x1209
+	ADC_SETUP();  
+	ADCSRA |= 1 << ADSC;
+	while (ADCSRA & (1 << ADSC))
+		;
+	if (ADC >= 680) 
+		usb_opt |= USB_OPT_REG_ENABLED;
+#if DEVICE_PID == 0x3006
+  else
+  {
+		LV_SETUP();
+  }
+#endif
 	/* Initialize USB Subsystem */
+	USB_Init(usb_opt);
+#else
 	USB_Init();
+#endif
 }
 
 //uint16_t ctr = 0;
@@ -217,16 +237,16 @@ void EVENT_USB_Device_ConfigurationChanged(void)
 {
 	/* Setup CDC Notification, Rx and Tx Endpoints */
 	Endpoint_ConfigureEndpoint(CDC_NOTIFICATION_EPNUM, EP_TYPE_INTERRUPT,
-	                           ENDPOINT_DIR_IN, CDC_NOTIFICATION_EPSIZE,
-	                           ENDPOINT_BANK_SINGLE);
+														 ENDPOINT_DIR_IN, CDC_NOTIFICATION_EPSIZE,
+														 ENDPOINT_BANK_SINGLE);
 
 	Endpoint_ConfigureEndpoint(CDC_TX_EPNUM, EP_TYPE_BULK,
-	                           ENDPOINT_DIR_IN, CDC_TXRX_EPSIZE,
-	                           ENDPOINT_BANK_SINGLE);
+														 ENDPOINT_DIR_IN, CDC_TXRX_EPSIZE,
+														 ENDPOINT_BANK_SINGLE);
 
 	Endpoint_ConfigureEndpoint(CDC_RX_EPNUM, EP_TYPE_BULK,
-	                           ENDPOINT_DIR_OUT, CDC_TXRX_EPSIZE,
-	                           ENDPOINT_BANK_SINGLE);
+														 ENDPOINT_DIR_OUT, CDC_TXRX_EPSIZE,
+														 ENDPOINT_BANK_SINGLE);
 }
 
 /** Event handler for the USB_ControlRequest event. This is used to catch and process control requests sent to
@@ -237,7 +257,7 @@ void EVENT_USB_Device_ControlRequest(void)
 {
 	/* Ignore any requests that aren't directed to the CDC interface */
 	if ((USB_ControlRequest.bmRequestType & (CONTROL_REQTYPE_TYPE | CONTROL_REQTYPE_RECIPIENT)) !=
-	    (REQTYPE_CLASS | REQREC_INTERFACE))
+			(REQTYPE_CLASS | REQREC_INTERFACE))
 	{
 		return;
 	}
@@ -320,7 +340,7 @@ static void ReadWriteMemoryBlock(const uint8_t Command)
 
 				/* If both bytes in current word have been read, increment the address counter */
 				if (HighByte)
-				  CurrAddress += 2;
+					CurrAddress += 2;
 
 				HighByte = !HighByte;
 			}
@@ -411,7 +431,7 @@ static uint8_t FetchNextCommandByte(void)
 		while (!(Endpoint_IsOUTReceived()))
 		{
 			if (USB_DeviceState == DEVICE_STATE_Unattached)
-			  return 0;
+				return 0;
 		}
 	}
 
@@ -437,7 +457,7 @@ static void WriteNextResponseByte(const uint8_t Response)
 		while (!(Endpoint_IsINReady()))
 		{
 			if (USB_DeviceState == DEVICE_STATE_Unattached)
-			  return;
+				return;
 		}
 	}
 
@@ -472,8 +492,8 @@ void CDC_Task(void)
 
 	/* Check if endpoint has a command in it sent from the host */
 	if (!(Endpoint_IsOUTReceived()))
-	  return;
-	  
+		return;
+		
 	RX_LED_ON();
 	RxLEDPulse = TX_RX_LED_PULSE_PERIOD;
 
@@ -536,7 +556,7 @@ void CDC_Task(void)
 	{
 		// Write the 7-byte software identifier to the endpoint 
 		for (uint8_t CurrByte = 0; CurrByte < 7; CurrByte++)
-		  WriteNextResponseByte(SOFTWARE_IDENTIFIER[CurrByte]);
+			WriteNextResponseByte(SOFTWARE_IDENTIFIER[CurrByte]);
 	}
 	else if (Command == 'V')
 	{
@@ -692,7 +712,7 @@ void CDC_Task(void)
 		while (!(Endpoint_IsINReady()))
 		{
 			if (USB_DeviceState == DEVICE_STATE_Unattached)
-			  return;
+				return;
 		}
 
 		Endpoint_ClearIN();
@@ -702,7 +722,7 @@ void CDC_Task(void)
 	while (!(Endpoint_IsINReady()))
 	{
 		if (USB_DeviceState == DEVICE_STATE_Unattached)
-		  return;
+			return;
 	}
 
 	/* Select the OUT endpoint */

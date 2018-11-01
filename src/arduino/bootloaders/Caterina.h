@@ -80,6 +80,9 @@
 			#define RX_LED_OFF()	PORTB |= (1<<0)
 			#define RX_LED_ON()		PORTB &= ~(1<<0)
 		#endif
+		// AREF = 2.56V, IN = ADC0
+		#define ADC_SETUP() ADMUX = (1 << REFS1) | (1 << REFS0)
+		#define LV_SETUP() DDRF  |= 1 << 1; PORTF &= ~(1 << 1)
 
 	/* Type Defines: */
 		/** Type define for a non-returning pointer to the start of the loaded application in flash memory. */

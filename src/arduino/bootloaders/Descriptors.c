@@ -80,7 +80,7 @@ const USB_Descriptor_Configuration_t ConfigurationDescriptor =
 
 			.ConfigurationNumber    = 1,
 			.ConfigurationStrIndex  = NO_DESCRIPTOR,
-
+			// USB_CONFIG_ATTR_SELFPOWERED
 			.ConfigAttributes       = USB_CONFIG_ATTR_BUSPOWERED,
 
 			.MaxPowerConsumption    = USB_CONFIG_POWER_MA(100)
@@ -199,6 +199,14 @@ const USB_Descriptor_String_t ProductString =
 	.UnicodeString			= L"Arduino Micro   "
 	#elif DEVICE_PID == 0x003C
 	.UnicodeString			= L"Arduino Esplora "
+	#elif DEVICE_PID == 0x3003
+	.UnicodeString			= L"Toueris CTOR    "
+	#elif DEVICE_PID == 0x3004
+	.UnicodeString			= L"Toueris MTOR    "
+	#elif DEVICE_PID == 0x3005
+	.UnicodeString			= L"Toueris MTMP    "
+	#elif DEVICE_PID == 0x3006
+	.UnicodeString			= L"Toueris UHMI    "
 	#else
 	.UnicodeString			= L"USB IO board    "
 	#endif
@@ -210,6 +218,8 @@ const USB_Descriptor_String_t ManufNameString =
 	
 	#if DEVICE_VID == 0x2341
 	.UnicodeString			= L"Arduino LLC"
+	#elif DEVICE_VID == 0x1209
+	.UnicodeString			= L"epsilonrt  "
 	#else
 	.UnicodeString			= L"Unknown    "
 	#endif

@@ -50,7 +50,8 @@
 # reuse of this VID by others is forbidden by USB-IF
 # official Arduino LLC VID
 # VID = 0x2341
-
+# epsilonrt VID (pid.codes)
+VID = 0x1209
 
 # USB product ID (PID)
 # official Leonardo PID
@@ -59,6 +60,14 @@
 # PID = 0x0037
 # official Esplora PID
 # PID = 0x003C
+# epsilonrt Toueris CTOR PID
+# PID = 0x3003
+# epsilonrt Toueris MTOR PID
+# PID = 0x3004
+# epsilonrt Toueris MTMP PID
+# PID = 0x3005
+# epsilonrt Toueris DHMI PID
+PID = 0x3006
 
 # MCU name
 MCU = atmega32u4
@@ -127,7 +136,7 @@ OBJDIR = .
 
 
 # Path to the LUFA library
-LUFA_PATH = ../../../../../../LUFA/LUFA-111009
+LUFA_PATH = ../LUFA-111009
 
 
 # LUFA library compile-time options and predefined tokens
@@ -137,9 +146,9 @@ LUFA_OPTS += -D ORDERED_EP_CONFIG
 LUFA_OPTS += -D FIXED_CONTROL_ENDPOINT_SIZE=8
 LUFA_OPTS += -D FIXED_NUM_CONFIGURATIONS=1
 LUFA_OPTS += -D USE_RAM_DESCRIPTORS
-LUFA_OPTS += -D USE_STATIC_OPTIONS="(USB_DEVICE_OPT_FULLSPEED | USB_OPT_REG_ENABLED | USB_OPT_AUTO_PLL)"
+#LUFA_OPTS += -D USE_STATIC_OPTIONS="(USB_DEVICE_OPT_FULLSPEED | USB_OPT_REG_ENABLED | USB_OPT_AUTO_PLL)"
 LUFA_OPTS += -D NO_INTERNAL_SERIAL
-LUFA_OPTS += -D NO_DEVICE_SELF_POWER
+#LUFA_OPTS += -D NO_DEVICE_SELF_POWER
 LUFA_OPTS += -D NO_DEVICE_REMOTE_WAKEUP
 LUFA_OPTS += -D NO_SOF_EVENTS
 
