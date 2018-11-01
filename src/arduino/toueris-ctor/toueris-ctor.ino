@@ -8,6 +8,7 @@
 #include <LCD_ST7032.h> // https://github.com/epsilonrt/LCD_ST7032
 #include <PinChangeInterrupt.h> // https://github.com/NicoHood/PinChangeInterrupt
 #include "bisrelay.h"
+#include "version.h" // for update this file: $ git-version version.h 
 
 // Modbus
 const byte MODBUS_SLAVEID = 8;
@@ -70,6 +71,10 @@ void setup() {
     lcd.begin();  // this function calls Wire.begin(), no need to double the call!
   }
   lcd.setcontrast (24); // contrast value range is 0-63, try 25@5V or 50@3.3V as a starting value
+  //          0123456789012345
+  lcd.print ("TOUERIS CTOR ");
+  lcd.print (VERSION_SHORT);
+  lcd.setCursor (1, 0);
   lcd.print ("Waiting HMI...");
 
   dev = EEPROM.read (eeDev);
@@ -77,8 +82,7 @@ void setup() {
     dev = 0;
     EEPROM.write (eeDev, dev);
   }
-  lcd.setCursor (1, 0);
-  lcd.print (dev, HEX);
+  // lcd.print (dev, HEX);
 
   while (!hmi.begin()) { // start the HMI by checking that it has worked well...
     lcd.setCursor (1, 0);
