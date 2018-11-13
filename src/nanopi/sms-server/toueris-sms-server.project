@@ -12,10 +12,7 @@
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>
-  <VirtualDirectory Name="gsmduino">
-    <File Name="gsmduino/src/gsmduino.cpp"/>
-    <File Name="gsmduino/src/gsmduino.h"/>
-  </VirtualDirectory>
+  <VirtualDirectory Name="gsmduino"/>
   <Settings Type="Executable">
     <GlobalSettings>
       <Compiler Options="-std=c++14;$(shell pkg-config --cflags piduino);$(shell pkg-config --cflags libmodbus)" C_Options="-std=c99;$(shell pkg-config --cflags piduino);$(shell pkg-config --cflags libmodbus)" Assembler="">
@@ -64,7 +61,9 @@
         <ClangCmpFlags/>
         <ClangPP/>
         <SearchPaths>/usr/include/piduino
-/usr/local/include/piduino</SearchPaths>
+/usr/local/include/piduino
+$(ProjectPath)/gsmduino/src
+/home/pascal/src/piduino/include/piduino</SearchPaths>
       </Completion>
     </Configuration>
     <Configuration Name="Release" CompilerType="gnu gcc" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">

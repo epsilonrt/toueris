@@ -1,6 +1,6 @@
 [submodule "src/nanopi/snmp-agent/mib"]
 	path = src/nanopi/snmp-agent/mib
-	url = git@github.com:epsilonrt/lpo-rouviere-mib.git
+	url = https://github.com/epsilonrt/lpo-rouviere-mib.git
 [submodule "src/nanopi/sms-server/gsmduino"]
 	path = src/nanopi/sms-server/gsmduino
-	url = git@github.com:epsilonrt/gsmduino.git
+	url = https://github.com/epsilonrt/gsmduino.git

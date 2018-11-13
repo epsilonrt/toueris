@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CodeLite_Workspace Name="toueris-server" Database="" Version="10.0.0">
-  <Project Name="toueris-snmp-agent" Path="snmp-agent/toueris-snmp-agent.project" Active="Yes"/>
-  <Project Name="toueris-sms-server" Path="sms-server/toueris-sms-server.project" Active="No"/>
+  <Project Name="toueris-snmp-agent" Path="snmp-agent/toueris-snmp-agent.project" Active="No"/>
+  <Project Name="toueris-sms-server" Path="sms-server/toueris-sms-server.project" Active="Yes"/>
   <BuildMatrix>
     <WorkspaceConfiguration Name="Debug" Selected="yes">
       <Environment/>
