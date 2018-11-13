@@ -9,12 +9,17 @@
   <Dependencies/>
   <VirtualDirectory Name="src">
     <File Name="toueris-sms-server.cpp"/>
+    <File Name="sender.h"/>
+    <File Name="sender.cpp"/>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>
   <VirtualDirectory Name="gsmduino">
     <File Name="gsmduino/src/gsmduino.cpp"/>
     <File Name="gsmduino/src/gsmduino.h"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="etc">
+    <File Name="toueris.conf"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
@@ -33,7 +38,7 @@
       </Compiler>
       <Linker Options="" Required="yes"/>
       <ResourceCompiler Options="" Required="no"/>
-      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
+      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="../toueris.conf" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
       <BuildSystem Name="Default"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
@@ -111,7 +116,4 @@ $(ProjectPath)/gsmduino/src
       </Completion>
     </Configuration>
   </Settings>
-  <VirtualDirectory Name="etc">
-    <File Name="toueris.config"/>
-  </VirtualDirectory>
 </CodeLite_Project>

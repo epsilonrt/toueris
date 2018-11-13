@@ -8,184 +8,46 @@
 // by Pascal JEAN https://github.com/epsilonrt
 
 // This example code is in the public domain.
-#include <vector>
 #include <piduino/configfile.h>
 #include <Piduino.h>  // All the magic is here ;-)
 #include "gsmduino.h"
+#include "sender.h"
 
 using namespace GsmDuino;
 
 Module  gsm;
 HardwareSerial & gsmSerial = Serial1;
-ConfigFile * cfg;
-int devices = 5;
 
-/*
-  Les commandes peuvent être en majuscules ou minuscules.
-  Pour effectuer des actions et recevoir des informations, une ligne
-  téléphonique s'enregistre à l'aide du message LOGXXXX, XXXX étant
-  le code secret (chiffres ou lettres).
-  En cas d'échec, aucune réponse n'est envoyée.
-  En cas de succès, LOGON est envoyée et la ligne est enregistrée comme
-  ligne autorisée.
-  Pour se dé-enregistrer, une ligne doit envoyer EXIT (réponse LOGOUT).
+// Config
+String gsm_password;
+String gsm_serial;
+String gsm_db;
 
-  Commande appareils
-    La commande de mise en marche est SX (SET), X étant le numéro de la voie,
-    réponse ON ou FAIL. La commande d'arrêt est CX (CLEAR), réponse OFF ou FAIL.
+String modbus_serial;
+String modbus_config;
+int ctor_devices;
 
-  Lecture valeurs
-    La commande de lecture
-    de l'état d'un appareil est DX (DEVICE),
-    pour une voie TOR c'est BX (BINARY),
-    pour une tension VX (VOLTAGE) et
-    TX pour la température.
-    La réponse est ON/OFF pour D ou B,
-    VX*XX.X pour une tension VX à XX.X Volts,
-    TX*±XX.X pour une température et
-    HX*±XX.X pour une hygrométrie.
+bool mySmsReceivedCB (unsigned int index, Module * m);
+bool readConfig (const String & filename);
 
-  Trap changement d'état
-    Un message BXON/BXOFF est envoyé à toutes les lignes enregistrées en cas
-    de changement d'état d'une voie TOR.
-
-  Envoi planifié
-    Une ligne enregistrée peut envoyer WDHHMM pour recevoir un SMS
-    hebdomadaire (D jour 1 pour lundi, HH heure, MM minute).
-    Elle reçoit alors un SMS contenant l'état des appareils, des TOR
-    et des tension (DXON, DXOFF, BXON, BXOFF, VX*XX.X),
-    chaque élément est séparé par un #.
-    Le message WOFF permet d'arrêter le service.
- */
-class Sender {
-  public:
-    Sender (GsmDuino::Module & module) : _m (module), _id (0), _isregister (false) {}
-    Sender (GsmDuino::Module & module, const String & number) : Sender (module) {
-      setNumber (number);
-    }
-    Sender (GsmDuino::Module & module, long id) : Sender (module) {
-      setId (id);
-    }
-
-    void setNumber (const String & number) {}
-    void setRegister (bool reg) {}
-    void setId (long id) {}
-
-    long id() const {
-      return _id;
-    }
-    const String & number() const {
-      return _number;
-    }
-    bool isRegister() const {
-      return _isregister;
-    }
-    bool sendResponse (const String & response) {
-      GsmDuino::Sms sms (response, _number);
-
-      return _m.smsSend (sms);
-    }
-
-    static vector<long> registerSenders();
-    static String password() {
-      return _passwd;
-    }
-  private:
-    GsmDuino::Module & _m;
-    long _id;
-    bool _isregister;
-    String _number;
-    static String _passwd;
-};
-
-// SMS received callback
-// this function is called by the polling loop when a new SMS arrives,
-// the m pointer can be used to access the module.
-bool mySmsReceivedCB (unsigned int index, Module * m) {
-  Sms sms;
-
-  if (m->smsRead (sms, index)) {
-    Sender sender (m, sms.destination());
-    const String & text = sms.text();
-
-    text.toUpperCase();
-
-    //  Une ligne téléphonique s'enregistre à l'aide du message LOGXXXX,
-    //  XXXX étant le code secret (chiffres ou lettres).
-    //  En cas d'échec, aucune réponse n'est envoyée.
-    //  En cas de succès, LOGON est envoyée et la ligne est enregistrée comme
-    //  ligne autorisée.
-    if (text.startsWith ("LOG")) {
-
-      if (cfg->keyExists ("password")) {
-        String pw = cfg->value("password");
-        
-        if (text.substring (3) == pw) {
-          
-          if (sender.sendResponse ("LOGON")) {
-
-            sender.setRegister (true);
-          }
-        }
-      }
-
-    }
-    else {
-      if (sender.isRegister()) {
-
-        if (text.startsWith ("EXIT")) {
-          if (sender.sendResponse ("LOGOUT")) {
-
-            sender.setRegister (false);
-          }
-        }
-        //  Commande appareils
-        //    La commande de mise en marche est SX (SET),
-        //    X étant le numéro de la voie, réponse ON ou FAIL.
-        //    La commande d'arrêt est CX (CLEAR), réponse OFF ou FAIL.
-        else if (text.startsWith ("S")) {
-          
-          int chan = text.subString(1).toInt();
-
-        }
-        else if (text.startsWith ("C")) {
-
-        }
-        else if (text.startsWith ("D")) {
-
-        }
-        else if (text.startsWith ("B")) {
-
-        }
-        else if (text.startsWith ("V")) {
-
-        }
-        else if (text.startsWith ("T")) {
-
-        }
-        else if (text.startsWith ("H")) {
-
-        }
-        else if (text.startsWith ("W")) {
-
-        }
-      }
-    }
-
-    m->smsDelete (index);
-    return true;
-  }
-  return false;
-}
-
+// -----------------------------------------------------------------------------
 void setup() {
-
-  cfg = new ConfigFile ("toueris.config");
-
   Console.begin (115200);
   Console.setTimeout (-1);
   Console.println (F ("Toueris SMS Server"));
   Console.println (F ("Waiting to initialize the module, may take a little while..."));
+
+  String cfg_filename = "/etc/toueris.conf";
+  if (argc > 1) {
+    cfg_filename = String (argv[1]);
+  }
+  if (!readConfig (cfg_filename)) {
+    exit (EXIT_FAILURE);
+  }
+
+  if (!Sender::dbOpen (gsm_db)) {
+    exit (EXIT_FAILURE);
+  }
 
   gsmSerial.begin (115200);
   gsm.smsSetReceivedCB (mySmsReceivedCB);
@@ -220,7 +82,202 @@ void setup() {
 #endif
 }
 
+// -----------------------------------------------------------------------------
 void loop () {
 
   gsm.poll (2000);
 }
+
+/*
+  Les commandes peuvent être en majuscules ou minuscules.
+  Pour effectuer des actions et recevoir des informations, une ligne
+  téléphonique s'enregistre à l'aide du message LOGXXXX, XXXX étant
+  le code secret (chiffres ou lettres).
+  En cas d'échec, aucune réponse n'est envoyée.
+  En cas de succès, LOGON est envoyée et la ligne est enregistrée comme
+  ligne autorisée.
+  Pour se dé-enregistrer, une ligne doit envoyer EXIT (réponse LOGOUT).
+
+  Commande appareils
+    La commande de mise en marche est SX (SET), X étant le numéro de la voie,
+    réponse ON ou FAIL. La commande d'arrêt est CX (CLEAR), réponse OFF ou FAIL.
+
+  Lecture valeurs
+    La commande de lecture
+    de l'état d'un appareil est DX (DEVICE),
+    pour une voie TOR c'est BX (BINARY),
+    pour une tension VX (VOLTAGE) et
+    TX pour la température.
+    La réponse est ON/OFF/FAIL pour D ou B,
+    VX*XX.X pour une tension VX à XX.X Volts,
+    TX*±XX.X pour une température et
+    HX*±XX.X pour une hygrométrie.
+
+  Trap changement d'état
+    Un message BXON/BXOFF est envoyé à toutes les lignes enregistrées en cas
+    de changement d'état d'une voie TOR.
+
+  Envoi planifié
+    Une ligne enregistrée peut envoyer WDHHMM pour recevoir un SMS
+    hebdomadaire (D jour 1 pour lundi, HH heure, MM minute).
+    Elle reçoit alors un SMS contenant l'état des appareils, des TOR
+    et des tension (DXON, DXOFF, BXON, BXOFF, VX*XX.X),
+    chaque élément est séparé par un #.
+    Le message WOFF permet d'arrêter le service.
+ */
+
+
+// -----------------------------------------------------------------------------
+// SMS received callback
+// this function is called by the polling loop when a new SMS arrives,
+// the m pointer can be used to access the module.
+bool mySmsReceivedCB (unsigned int index, Module * m) {
+  Sms sms;
+
+  if (m->smsRead (sms, index)) {
+    Sender sender (*m, sms.destination());
+    String text = sms.text();
+
+    text.toUpperCase();
+
+    //  Une ligne téléphonique s'enregistre à l'aide du message LOGXXXX,
+    //  XXXX étant le code secret (chiffres ou lettres).
+    //  En cas d'échec, aucune réponse n'est envoyée.
+    //  En cas de succès, LOGON est envoyée et la ligne est enregistrée comme
+    //  ligne autorisée.
+    if (text.startsWith ("LOG")) {
+
+      if (text.substring (3) == gsm_password) {
+
+        if (sender.sendResponse ("LOGON")) {
+
+          sender.setRegister (true);
+          sender.saveToDb();
+        }
+      }
+    }
+    else {
+      if (sender.isRegister()) {
+
+        if (text.startsWith ("EXIT")) {
+          if (sender.sendResponse ("LOGOUT")) {
+
+            sender.setRegister (false);
+            sender.saveToDb();
+          }
+        }
+        else {
+          int i = text.substring (1).toInt();
+
+          //  Commande appareils
+          //    La commande de mise en marche est SX (SET),
+          //    X étant le numéro de la voie, réponse ON ou FAIL.
+          //    La commande d'arrêt est CX (CLEAR), réponse OFF ou FAIL.
+          if (text.startsWith ("S")) {
+
+            if (i < ctor_devices) {
+              // TODO
+              sender.sendResponse ("ON");
+            }
+            else {
+              sender.sendResponse ("FAIL");
+            }
+          }
+          else if (text.startsWith ("C")) {
+            if (i < ctor_devices) {
+              // TODO
+              sender.sendResponse ("OFF");
+            }
+            else {
+              sender.sendResponse ("FAIL");
+            }
+
+          }
+          // La commande de lecture de l'état d'un appareil est DX (DEVICE),
+          // La réponse est ON/OFF/FAIL.
+          else if (text.startsWith ("D")) {
+            if (i < ctor_devices) {
+              // TODO
+              sender.sendResponse ("XX");
+            }
+            else {
+              sender.sendResponse ("FAIL");
+            }
+          }
+          else if (text.startsWith ("B")) {
+
+          }
+          else if (text.startsWith ("V")) {
+
+          }
+          else if (text.startsWith ("T")) {
+
+          }
+          else if (text.startsWith ("H")) {
+
+          }
+          else if (text.startsWith ("W")) {
+
+          }
+        }
+      }
+    }
+
+    m->smsDelete (index);
+    return true;
+  }
+  return false;
+}
+
+// -----------------------------------------------------------------------------
+bool readConfig (const String & filename) {
+
+  try {
+    Piduino::ConfigFile cfg (filename);
+    String str;
+
+    // GSM
+    if (!cfg.keyExists ("gsm_password")) {
+      return false;
+    }
+    gsm_password = cfg.value ("gsm_password");
+
+    if (!cfg.keyExists ("gsm_serial")) {
+      return false;
+    }
+    gsm_serial = cfg.value ("gsm_serial");
+
+    if (!cfg.keyExists ("gsm_db")) {
+      return false;
+    }
+    gsm_db = cfg.value ("gsm_db");
+
+    // MODBUS
+    if (!cfg.keyExists ("modbus_serial")) {
+      return false;
+    }
+    modbus_serial = cfg.value ("modbus_serial");
+
+    if (!cfg.keyExists ("modbus_config")) {
+      modbus_config = String ("19200E1");
+    }
+    else {
+      modbus_config = cfg.value ("modbus_config");
+    }
+
+    if (!cfg.keyExists ("ctor_devices")) {
+      return false;
+    }
+    str = cfg.value ("ctor_devices");
+    ctor_devices = str.toInt();
+  }
+  catch (...) {
+
+    Console.print ("Unable to read ");
+    Console.println (filename);
+    return false;
+  }
+  return true;
+}
+
+// -----------------------------------------------------------------------------
