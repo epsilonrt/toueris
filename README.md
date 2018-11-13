@@ -26,3 +26,9 @@ The need expressed by the client is described using a requirements diagram:
 The context of the system is as follows:
 
 ![Context Diagram](https://raw.githubusercontent.com/epsilonrt/toueris/master/engineering/images/SysML_Internal_Block_Diagram__STS_SN__Contexte_du_systeme_de_supervision.png)
+
+## How to clone ?
+
+     git clone https://github.com/epsilonrt/toueris.git
+     cd toueris
+     git submodule update --init 

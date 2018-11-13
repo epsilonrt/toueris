@@ -12,7 +12,10 @@
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>
-  <VirtualDirectory Name="gsmduino"/>
+  <VirtualDirectory Name="gsmduino">
+    <File Name="gsmduino/src/gsmduino.cpp"/>
+    <File Name="gsmduino/src/gsmduino.h"/>
+  </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
       <Compiler Options="-std=c++14;$(shell pkg-config --cflags piduino);$(shell pkg-config --cflags libmodbus)" C_Options="-std=c99;$(shell pkg-config --cflags piduino);$(shell pkg-config --cflags libmodbus)" Assembler="">
@@ -108,4 +111,7 @@ $(ProjectPath)/gsmduino/src
       </Completion>
     </Configuration>
   </Settings>
+  <VirtualDirectory Name="etc">
+    <File Name="toueris.config"/>
+  </VirtualDirectory>
 </CodeLite_Project>
