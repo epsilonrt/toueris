@@ -10,21 +10,26 @@
 // This example code is in the public domain.
 #include <piduino/configfile.h>
 #include <Piduino.h>  // All the magic is here ;-)
+#include <modbuspp.h>
 #include "gsmduino.h"
 #include "sender.h"
 
 using namespace GsmDuino;
+using namespace Modbus;
 
 Module  gsm;
 HardwareSerial & gsmSerial = Serial1;
+Master * mb;
 
 // Config
 String gsm_password;
 String gsm_serial;
 String gsm_db;
 
-String modbus_serial;
-String modbus_config;
+std::string modbus_serial;
+std::string modbus_config;
+int modbus_slave;
+
 int ctor_devices;
 
 bool mySmsReceivedCB (unsigned int index, Module * m);
@@ -45,6 +50,20 @@ void setup() {
     exit (EXIT_FAILURE);
   }
 
+  // Modbus
+  mb = new Master (Rtu, modbus_serial, modbus_config); // new master on RTU
+  // if you have to handle the DE signal of the line driver with RTS,
+  // you should uncomment the lines below...
+  mb->rtu().setRts (RtsDown);
+  mb->rtu().setSerialMode (Rs485);
+  if (!mb->setSlave (modbus_slave)) {
+    exit (EXIT_FAILURE);
+  }
+  if (!mb->open ()) { // open a connection
+    exit (EXIT_FAILURE);
+  }
+
+  // Gsm
   if (!Sender::dbOpen (gsm_db)) {
     exit (EXIT_FAILURE);
   }
@@ -175,18 +194,29 @@ bool mySmsReceivedCB (unsigned int index, Module * m) {
           //    La commande d'arrêt est CX (CLEAR), réponse OFF ou FAIL.
           if (text.startsWith ("S")) {
 
-            if (i < ctor_devices) {
-              // TODO
-              sender.sendResponse ("ON");
+            if (i <= ctor_devices) {
+
+              if (mb->writeCoil (i, true)) {
+                sender.sendResponse ("ON");
+              }
+              else {
+                sender.sendResponse ("FAIL");
+              }
             }
             else {
               sender.sendResponse ("FAIL");
             }
           }
           else if (text.startsWith ("C")) {
-            if (i < ctor_devices) {
-              // TODO
-              sender.sendResponse ("OFF");
+
+            if (i <= ctor_devices) {
+
+              if (mb->writeCoil (i, false)) {
+                sender.sendResponse ("OFF");
+              }
+              else {
+                sender.sendResponse ("FAIL");
+              }
             }
             else {
               sender.sendResponse ("FAIL");
@@ -196,9 +226,20 @@ bool mySmsReceivedCB (unsigned int index, Module * m) {
           // La commande de lecture de l'état d'un appareil est DX (DEVICE),
           // La réponse est ON/OFF/FAIL.
           else if (text.startsWith ("D")) {
-            if (i < ctor_devices) {
-              // TODO
-              sender.sendResponse ("XX");
+            if (i <= ctor_devices) {
+              bool value;
+
+              if (mb->readCoils (i, &value)) {
+                if (value) {
+                  sender.sendResponse ("ON");
+                }
+                else {
+                  sender.sendResponse ("OFF");
+                }
+              }
+              else {
+                sender.sendResponse ("FAIL");
+              }
             }
             else {
               sender.sendResponse ("FAIL");
@@ -257,6 +298,12 @@ bool readConfig (const String & filename) {
       return false;
     }
     modbus_serial = cfg.value ("modbus_serial");
+
+    if (!cfg.keyExists ("modbus_slave")) {
+      return false;
+    }
+    str = cfg.value ("modbus_slave");
+    modbus_slave = str.toInt();
 
     if (!cfg.keyExists ("modbus_config")) {
       modbus_config = String ("19200E1");

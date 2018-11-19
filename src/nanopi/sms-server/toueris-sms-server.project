@@ -23,11 +23,11 @@
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
-      <Compiler Options="-std=c++14;$(shell pkg-config --cflags piduino);$(shell pkg-config --cflags libmodbus)" C_Options="-std=c99;$(shell pkg-config --cflags piduino);$(shell pkg-config --cflags libmodbus)" Assembler="">
+      <Compiler Options="-std=c++14;$(shell pkg-config --cflags piduino);$(shell pkg-config --cflags libmodbuspp)" C_Options="-std=c99;$(shell pkg-config --cflags piduino);$(shell pkg-config --cflags libmodbus)" Assembler="">
         <IncludePath Value="."/>
         <IncludePath Value="gsmduino/src"/>
       </Compiler>
-      <Linker Options="$(shell pkg-config --libs piduino);$(shell net-snmp-config --agent-libs);$(shell pkg-config --libs libmodbus)">
+      <Linker Options="$(shell pkg-config --libs piduino);$(shell net-snmp-config --agent-libs);$(shell pkg-config --libs libmodbuspp)">
         <LibraryPath Value="."/>
       </Linker>
       <ResourceCompiler Options=""/>
