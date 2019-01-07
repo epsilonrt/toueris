@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<CodeLite_Project Name="toueris-sms-server" Version="10.0.0" InternalType="Console">
+<CodeLite_Project Name="toueris-voice-server" Version="10.0.0" InternalType="Console">
   <Plugins>
     <Plugin Name="qmake">
       <![CDATA[00010001N0005Debug000000000000]]>
@@ -8,37 +8,28 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
-    <File Name="toueris-sms-server.cpp"/>
-    <File Name="sender.h"/>
-    <File Name="sender.cpp"/>
-  </VirtualDirectory>
-  <VirtualDirectory Name="gsmduino">
-    <File Name="gsmduino/src/gsmduino.cpp"/>
-    <File Name="gsmduino/src/gsmduino.h"/>
+    <File Name="toueris-voice-server.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="etc">
     <File Name="toueris.conf"/>
   </VirtualDirectory>
-  <Dependencies Name="Debug"/>
-  <Dependencies Name="Release"/>
   <Settings Type="Executable">
     <GlobalSettings>
-      <Compiler Options="-std=c++14;$(shell pkg-config --cflags piduino);$(shell pkg-config --cflags libmodbuspp)" C_Options="-std=c99;$(shell pkg-config --cflags piduino);$(shell pkg-config --cflags libmodbus)" Assembler="">
+      <Compiler Options="-std=c++14;$(shell pkg-config --cflags libpiphons);$(shell pkg-config --cflags libmodbuspp)" C_Options="-std=c99" Assembler="">
         <IncludePath Value="."/>
-        <IncludePath Value="gsmduino/src"/>
       </Compiler>
-      <Linker Options="$(shell pkg-config --libs piduino);$(shell pkg-config --libs libmodbuspp)">
+      <Linker Options="$(shell pkg-config --libs libpiphons);$(shell pkg-config --libs libmodbuspp)">
         <LibraryPath Value="."/>
       </Linker>
       <ResourceCompiler Options=""/>
     </GlobalSettings>
-    <Configuration Name="Debug" CompilerType="gnu gcc" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+    <Configuration Name="Debug" CompilerType="GCC" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
       <Compiler Options="-g;-O0;-Wall" C_Options="-g;-O0;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
       </Compiler>
       <Linker Options="" Required="yes"/>
       <ResourceCompiler Options="" Required="no"/>
-      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="../toueris.conf" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
+      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
       <BuildSystem Name="Default"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
@@ -64,17 +55,15 @@
         <CustomPostBuild/>
         <CustomPreBuild/>
       </AdditionalRules>
-      <Completion EnableCpp11="no" EnableCpp14="yes">
+      <Completion EnableCpp11="no" EnableCpp14="no">
         <ClangCmpFlagsC/>
         <ClangCmpFlags/>
         <ClangPP/>
-        <SearchPaths>/usr/include/piduino
-/usr/local/include/piduino
-$(ProjectPath)/gsmduino/src
-/home/pascal/src/piduino/include/piduino</SearchPaths>
+        <SearchPaths>/usr/include/piphons
+/usr/local/include/piphons</SearchPaths>
       </Completion>
     </Configuration>
-    <Configuration Name="Release" CompilerType="gnu gcc" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+    <Configuration Name="Release" CompilerType="GCC" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
       <Compiler Options="-O2;-Wall" C_Options="-O2;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
         <Preprocessor Value="NDEBUG"/>
@@ -107,12 +96,12 @@ $(ProjectPath)/gsmduino/src
         <CustomPostBuild/>
         <CustomPreBuild/>
       </AdditionalRules>
-      <Completion EnableCpp11="no" EnableCpp14="yes">
+      <Completion EnableCpp11="no" EnableCpp14="no">
         <ClangCmpFlagsC/>
         <ClangCmpFlags/>
         <ClangPP/>
-        <SearchPaths>/usr/include/piduino
-/usr/local/include/piduino</SearchPaths>
+        <SearchPaths>/usr/include/piphons
+/usr/local/include/piphons</SearchPaths>
       </Completion>
     </Configuration>
   </Settings>
