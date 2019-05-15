@@ -3,7 +3,6 @@
   <Project Name="toueris-snmp-agent" Path="snmp-agent/toueris-snmp-agent.project" Active="No"/>
   <Project Name="toueris-sms-server" Path="sms-server/toueris-sms-server.project" Active="No"/>
   <Project Name="toueris-voice-server" Path="voice-server/toueris-voice-server.project" Active="Yes"/>
-  <Project Name="piduino-test" Path="piduino-test/piduino-test.project" Active="No"/>
   <BuildMatrix>
     <WorkspaceConfiguration Name="Debug" Selected="yes">
       <Environment/>
